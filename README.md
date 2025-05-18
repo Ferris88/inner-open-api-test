@@ -21,6 +21,8 @@
 - `display-index` 的callDataUrl 中配置请求地址 **`url`**
 - 如果要发Tron的交易 也要配置 **`TRON_PRIVATE_KEY`** 和 **`trongrid ApiKey`**
 - > **`url`** 中请求的 **`user`** 替换为自己的钱包地址
+  > 如果涉及到Solana交易 需要到  https://dashboard.helius.dev/ 申请节点 
+> 最新脚本支持Solana Chain，需要执行 `send-tx-demo-v1.js`  并且确保`yarn install`是完整可以执行的 [遇到问题请参考Gpt]
 
 
 ## 3. 示例

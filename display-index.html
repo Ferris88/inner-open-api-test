@@ -151,6 +151,7 @@
                 <option value="10">OP</option>
                 <option value="195">TRON</option>
                 <option value="146">SONIC</option>
+                <option value="501">SOLANA</option>
             </select><br><br>
 
             <label for="jsonInput">Transaction JSON:</label><br>
@@ -187,6 +188,7 @@
                 <option value="196">X_LAYER</option>
                 <option value="10">OP</option>
                 <option value="195">TRON</option>
+                <option value="501">SOLANA</option>
             </select><br><br>
 
             <button type="submit" class="button">Request CallData</button>
@@ -207,31 +209,39 @@
         const jsonInput = document.getElementById('jsonInput').value;
         const transactionStatus = document.getElementById('transactionStatus');
         transactionStatus.innerText = 'Sending transaction...';
-        transactionStatus.style.fontSize = '20px'; // 增大字体
-        transactionStatus.style.padding = '20px'; // 增大内边距
-        transactionStatus.style.border = '2px solid #000'; // 添加边框
-        transactionStatus.style.backgroundColor = '#f0f0f0'; // 设置背景颜色
+        transactionStatus.style.fontSize = '20px';
+        transactionStatus.style.padding = '20px';
+        transactionStatus.style.border = '2px solid #000';
+        transactionStatus.style.backgroundColor = '#f0f0f0';
+
         try {
             const response = await fetch('http://localhost:3000/send-transaction', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({chainId, jsonInput})
+                body: JSON.stringify({ chainId, jsonInput })
             });
 
-            console.log('Response received:', response); // Debugging line to check response object
-            const result = await response.json();
-            console.log('Response status:', response.status); // Debugging line to check response status
-            console.log('Result:', result); // Debugging line to check result value
+            console.log('Response received:', response);
+            let result;
+            try {
+                result = await response.json(); // 尝试解析 JSON
+            } catch (jsonError) {
+                console.error('Failed to parse JSON:', jsonError);
+                transactionStatus.innerText = 'Failed to parse server response.';
+                return;
+            }
+
+            console.log('Response status:', response.status);
+            console.log('Result:', result);
+
             if (response.ok) {
                 transactionStatus.innerText = 'Transaction sent successfully: ' + result.transactionHash;
             } else {
-                // 打印 result 对象以调试
                 console.log('Error result:', result);
-
-               // alert('Error: ' + result.error)
-                transactionStatus.innerText = JSON.parse(result.error);
+                const errorMessage = result.error?.message || JSON.stringify(result.error || result);
+                transactionStatus.innerText = 'Error: ' + errorMessage;
             }
         } catch (error) {
             const errorMessage = error.toString() + '\n' + (error.stack || '');

@@ -42,7 +42,18 @@ app.post('/send-transaction', async (req, res) => {
 
         res.send({transactionHash: txHash});
     } catch (error) {
-        res.status(500).json({error: error.message});
+        console.error('Error in /send-transaction:', error);
+
+        // 确保错误信息是可序列化的
+        const errorDetails = {
+            message: error.message || 'Unknown error',
+            stack: error.stack || 'No stack trace available',
+            code: error.code || 'UNKNOWN_ERROR',
+            errors: error.errors || []
+        };
+
+        // 返回 JSON 格式的错误信息
+        res.status(500).json(errorDetails); // 直接传递对象
     }
 });
 
