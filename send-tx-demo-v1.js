@@ -27,10 +27,11 @@ const PROXY_PORT = 3001;
 app.use(bodyParser.json());
 app.use(cors());
 
-const evmPrivateKey = '';
-const tronPrivateKey = '';
-const solanaPrivateKey = '';
-const suiPrivateKey = '';
+// TODO: Replace with your actual private keys
+const EVM_PRIVATE_KEY = '';
+const TRON_PRIVATE_KEY = '';
+const SOLANA_PRIVATE_KEY = '';
+const SUI_PRIVATE_KEY = '';
 
 const ChainId = {
     ETH: 1,
@@ -68,33 +69,32 @@ function getRpcUrl(chainId) {
     return rpcUrls[chainId];
 }
 
-async function estimateGas(web3, transaction) {
+// ---------- EVM ----------
+async function estimateEvmGas(web3, tx) {
     try {
-        return await web3.eth.estimateGas(transaction) * BigInt(2);
+        return await web3.eth.estimateGas(tx) * BigInt(2);
     } catch (error) {
-        console.error('Failed to estimate gas:', error);
+        console.error('EVM Gas estimation failed:', error);
         throw error;
     }
 }
 
-async function sendEvmTransaction(web3, txObject, privateKey) {
+async function signAndSendEvmTx(web3, txObject, privateKey) {
     try {
         const signedTx = await web3.eth.accounts.signTransaction(txObject, privateKey);
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
         return receipt.transactionHash;
     } catch (error) {
-        console.error('Failed to send EVM transaction:', error);
+        console.error('EVM Transaction failed:', error);
         throw error;
     }
 }
 
-async function handleEvmTransaction(transactionData) {
-    const { from, to, chainId, data, value } = transactionData;
+async function processEvmTransaction({ from, to, chainId, data, value }) {
     const web3 = new Web3(getRpcUrl(chainId));
-
     const nonce = await web3.eth.getTransactionCount(from, 'latest');
     const gasPrice = await web3.eth.getGasPrice();
-    const gasLimit = await estimateGas(web3, { from, to, data, value: parseInt(value, 10) });
+    const gasLimit = await estimateEvmGas(web3, { from, to, data, value: parseInt(value, 10) });
 
     const txObject = {
         nonce,
@@ -105,28 +105,29 @@ async function handleEvmTransaction(transactionData) {
         value: parseInt(value, 10)
     };
 
-    return await sendEvmTransaction(web3, txObject, evmPrivateKey);
+    return await signAndSendEvmTx(web3, txObject, EVM_PRIVATE_KEY);
 }
 
-async function handleTronTransaction(from, to, data, value, abi) {
+// ---------- TRON ----------
+async function processTronTransaction(from, to, data, value, abi) {
     try {
-        const rawTransaction = await assembleTronRequest(from, to, data, value, abi);
-        const transaction = rawTransaction.transaction;
-        if (!transaction) throw new Error('Transaction data is missing');
+        const rawTx = await buildTronSmartContractTx(from, to, data, value, abi);
+        const transaction = rawTx.transaction;
+        if (!transaction) throw new Error('TRON transaction data is missing');
 
-        const signedTransaction = transaction.signature
+        const signedTx = transaction.signature
             ? transaction
-            : await tronWeb.trx.sign(transaction, tronPrivateKey);
+            : await tronWeb.trx.sign(transaction, TRON_PRIVATE_KEY);
 
-        const result = await tronWeb.trx.sendRawTransaction(signedTransaction);
+        const result = await tronWeb.trx.sendRawTransaction(signedTx);
         return result;
     } catch (error) {
-        console.error('Error in TRON transaction:', error);
+        console.error('TRON Transaction failed:', error);
         throw error;
     }
 }
 
-async function assembleTronRequest(from, to, data, value, abi) {
+async function buildTronSmartContractTx(from, to, data, value, abi) {
     const options = {
         method: 'POST',
         url: 'https://api.trongrid.io/wallet/triggersmartcontract',
@@ -150,7 +151,8 @@ async function assembleTronRequest(from, to, data, value, abi) {
     });
 }
 
-async function handleSolanaTransaction(callData) {
+// ---------- SOLANA ----------
+async function processSolanaTransaction(callData) {
     const transaction = bs58.decode(callData);
 
     let tx;
@@ -167,7 +169,7 @@ async function handleSolanaTransaction(callData) {
         tx.recentBlockhash = recentBlockHash.blockhash;
     }
 
-    const feePayer = solanaWeb3.Keypair.fromSecretKey(bs58.decode(solanaPrivateKey));
+    const feePayer = solanaWeb3.Keypair.fromSecretKey(bs58.decode(SOLANA_PRIVATE_KEY));
     if (tx instanceof solanaWeb3.VersionedTransaction) {
         tx.sign([feePayer]);
     } else {
@@ -184,8 +186,10 @@ async function handleSolanaTransaction(callData) {
     return `https://solscan.io/tx/${txId}`;
 }
 
-async function handleSuiTransaction(callData) {
-    const [, words] = base.fromBech32(suiPrivateKey);
+// ---------- SUI ----------
+async function processSuiTransaction(callData) {
+    
+    const [, words] = base.fromBech32(SUI_PRIVATE_KEY);
     const keypair = Ed25519Keypair.fromSecretKey(fromHex(base.toHex(words.slice(1), true)));
     const sender = keypair.getPublicKey().toSuiAddress();
 
@@ -222,25 +226,27 @@ async function handleSuiTransaction(callData) {
     return response.data.result.effects.transactionDigest;
 }
 
-async function main(transactionData) {
+// ---------- Main Dispatcher ----------
+async function dispatchTransaction(transactionData) {
     const { chainId, jsonInput } = transactionData;
     const { from, to, data, value, abi } = JSON.parse(jsonInput);
 
     switch (Number(chainId)) {
         case ChainId.TRON:
-            return await handleTronTransaction(from, to, data, value, abi);
+            return await processTronTransaction(from, to, data, value, abi);
         case ChainId.SOLANA:
-            return await handleSolanaTransaction(data);
+            return await processSolanaTransaction(data);
         case ChainId.SUI:
-            return await handleSuiTransaction(data);
+            return await processSuiTransaction(data);
         default:
-            return await handleEvmTransaction({ from, to, chainId, data, value });
+            return await processEvmTransaction({ from, to, chainId, data, value });
     }
 }
 
+// ---------- API ----------
 app.post('/send-transaction', async (req, res) => {
     try {
-        const txHash = await main(req.body);
+        const txHash = await dispatchTransaction(req.body);
         res.set('Access-Control-Allow-Origin', '*');
         res.send({ transactionHash: txHash });
     } catch (error) {
@@ -254,7 +260,8 @@ app.post('/send-transaction', async (req, res) => {
     }
 });
 
-function setupProxy(app, port) {
+// ---------- Proxy ----------
+function setupProxyServer(app, port) {
     app.use(cors());
     app.get('/proxy', (req, res) => {
         const url = req.query.url;
@@ -271,5 +278,5 @@ function setupProxy(app, port) {
     app.listen(port, () => console.log(`Proxy server running on port ${port}`));
 }
 
-setupProxy(app, PORT);
-setupProxy(express(), PROXY_PORT);
+setupProxyServer(app, PORT);
+setupProxyServer(express(), PROXY_PORT);
