@@ -30,7 +30,7 @@
 
 ## 4. 示例效果
 
-![img.png](img.png)
+![image.png](image.png)
 
 ---
 > 💡 **如有疑问，欢迎查阅文档或联系 Ferris 获取支持。**

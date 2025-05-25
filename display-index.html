@@ -6,15 +6,149 @@
     <link rel="icon" href="icon.png" type="image/x-icon">
     <title>Send Transaction</title>
     <style>
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
-            font-family: Arial, sans-serif;
-            position: relative;
-            background: linear-gradient(135deg, #6297cb 0%, #fad0c4 100%);
         }
 
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f0f8ff 20%, #f5f5dc 80%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .tutorial {
+            background: #e3f2fd;
+            border-left: 4px solid #1a73e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .large-input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #f8f9fa;
+            transition: border-color 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%23333" d="M7 10l5 5 5-5z"/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 10px;
+        }
+
+        .large-input:focus,
+        select:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .button {
+            background-color: #1a73e8;
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .button:hover {
+            background-color: #1556b0;
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            color: #2e7d32;
+            background: #e8f5e9;
+        }
+
+        .status.error {
+            color: #b71c1c;
+            background: #ffebee;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 18px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 雪花效果（保留原有逻辑） */
         .snowflake {
             position: absolute;
             top: -10px;
@@ -40,291 +174,273 @@
                 transform: translateX(20px);
             }
         }
-
-        .container {
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            z-index: 1;
-            flex-wrap: wrap;
-        }
-
-        .form-container {
-            margin: 20px;
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .large-input {
-            width: 100%;
-            height: auto;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        .button:hover {
-            background-color: #45a049;
-        }
-
-        .button:active {
-            transform: scale(0.98);
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        pre {
-            background-color: rgba(232, 210, 180, 0.84);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #f4f4f4;
-            text-align: center;
-        }
-
-        .tutorial {
-            margin: 20px;
-            padding: 10px;
-            border: 3px solid #ccc;
-            border-radius: 4px;
-            background-color: #e9f7ef;
-        }
     </style>
 </head>
 <body>
-<h1>Send Transaction</h1>
-<div class="tutorial">
-    <h2>使用教程</h2>
-    <ol>
-        <li>页面右边可以发起pre环境的/swap 接口</li>
-        <li>点击[Copy to Input]可以将请求的/swap接口 tx信息自动填写到左边</li>
-        <li>点击“Send Transaction”按钮发送交易。</li>
-        <li>查看交易状态。</li>
-    </ol>
-</div>
-<div class="container">
-    <div class="form-container">
-        <form id="transactionForm">
-            <label for="chainId">Chain ID:</label>
-            <select id="chainId" name="chainId" class="large-input" required>
-                <option value="1">ETH</option>
-                <option value="56">BSC</option>
-                <option value="137">POLYGON</option>
-                <option value="43114">AVALANCHE</option>
-                <option value="42161">ARBITRUM</option>
-                <option value="8453">BASE</option>
-                <option value="196">X_LAYER</option>
-                <option value="10">OP</option>
-                <option value="195">TRON</option>
-                <option value="146">SONIC</option>
-                <option value="501">SOLANA</option>
-                <option value="130">UNICHAIN</option>
-                <option value="784">SUI</option>
-            </select><br><br>
-
-            <label for="jsonInput">Transaction JSON:</label><br>
-            <textarea id="jsonInput" name="jsonInput" rows="10" class="large-input" required></textarea><br><br>
-
-            <button type="submit" class="button">Send Transaction</button>
-        </form>
-        <div id="transactionStatus" class="status"></div>
+    <h1>Send Transaction 💰</h1>
+    
+    <div class="tutorial card">
+        <h2>使用教程</h2>
+        <ol style="padding-left: 25px; counter-reset: step">
+            <li style="position: relative; margin-bottom: 10px; list-style: none;">
+                <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
+                      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                      font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
+                页面右边可以发起pre环境的/swap 接口
+            </li>
+            <li style="position: relative; margin-bottom: 10px; list-style: none;">
+                <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
+                      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                      font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
+                点击[Copy to Input]可以将请求的/swap接口 tx信息自动填写到左边
+            </li>
+            <li style="position: relative; margin-bottom: 10px; list-style: none;">
+                <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
+                      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                      font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
+                点击“Send Transaction”按钮发送交易。
+            </li>
+            <li style="position: relative; margin-bottom: 10px; list-style: none;">
+                <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
+                      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                      font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
+                查看交易状态。
+            </li>
+        </ol>
     </div>
-    <div class="form-container">
-        <form id="callDataForm">
-            <label for="from">From:</label>
-            <input type="text" id="from" name="from" class="large-input" required><br><br>
 
-            <label for="to">To:</label>
-            <input type="text" id="to" name="to" class="large-input" required><br><br>
+    <div class="container">
+        <div class="form-container card">
+            <form id="transactionForm">
+                <div class="form-group">
+                    <label for="chainId">Chain ID:</label>
+                    <select id="chainId" name="chainId" class="large-input" required>
+                        <option value="1">ETH</option>
+                        <option value="56">BSC</option>
+                        <option value="137">POLYGON</option>
+                        <option value="43114">AVALANCHE</option>
+                        <option value="42161">ARBITRUM</option>
+                        <option value="8453">BASE</option>
+                        <option value="196">X_LAYER</option>
+                        <option value="10">OP</option>
+                        <option value="195">TRON</option>
+                        <option value="146">SONIC</option>
+                        <option value="501">SOLANA</option>
+                        <option value="130">UNICHAIN</option>
+                        <option value="784">SUI</option>
+                    </select>
+                </div>
 
-            <label for="amount">Amount:</label>
-            <input type="text" id="amount" name="amount" class="large-input" required>
-            <div class="button-container">
-                <button type="button" class="button" onclick="setAmount(1000000)">1000000</button>
-                <button type="button" class="button" onclick="setAmount(1000000000000000)">1000000000000000</button>
-            </div>
-            <br><br>
+                <div class="form-group">
+                    <label for="jsonInput">Transaction JSON:</label>
+                    <textarea id="jsonInput" name="jsonInput" rows="8" class="large-input" required></textarea>
+                </div>
 
-            <label for="callChainId">Chain ID:</label>
-            <select id="callChainId" name="callChainId" class="large-input" required>
-                <option value="1">ETH</option>
-                <option value="56">BSC</option>
-                <option value="137">POLYGON</option>
-                <option value="43114">AVALANCHE</option>
-                <option value="42161">ARBITRUM</option>
-                <option value="8453">BASE</option>
-                <option value="196">X_LAYER</option>
-                <option value="10">OP</option>
-                <option value="195">TRON</option>
-                <option value="501">SOLANA</option>
-                <option value="130">UNICHAIN</option>
-                <option value="784">SUI</option>
-            </select><br><br>
+                <button type="submit" class="button">
+                    Send Transaction 
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9l-6 6m0 0l6 6m-6-6h12.75" />
+                    </svg>
+                </button>
+            </form>
 
-            <button type="submit" class="button">Request CallData</button>
-        </form>
-        <div class="button-container">
-            <button class="button" onclick="copyToInput()">Copy to Input</button>
-            <button class="button" onclick="copyToClipboard()">Copy JSON</button>
+            <div id="transactionStatus" class="status"></div>
         </div>
-        <pre id="callDataResult"></pre>
+
+        <div class="form-container card">
+            <form id="callDataForm">
+                <div class="form-group">
+                    <label for="from">From:</label>
+                    <input type="text" id="from" name="from" class="large-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="to">To:</label>
+                    <input type="text" id="to" name="to" class="large-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount:</label>
+                    <input type="text" id="amount" name="amount" class="large-input" required>
+                    <div class="button-container">
+                        <button type="button" class="button" onclick="setAmount(1000000)">
+                            1,000,000 
+                        </button>
+                        <button type="button" class="button" onclick="setAmount(1000000000000000)">
+                            10,000,000,000,000,000 
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="callChainId">Chain ID:</label>
+                    <select id="callChainId" name="callChainId" class="large-input" required>
+                        <option value="1">ETH</option>
+                        <option value="56">BSC</option>
+                        <option value="137">POLYGON</option>
+                        <option value="43114">AVALANCHE</option>
+                        <option value="42161">ARBITRUM</option>
+                        <option value="8453">BASE</option>
+                        <option value="196">X_LAYER</option>
+                        <option value="10">OP</option>
+                        <option value="195">TRON</option>
+                        <option value="501">SOLANA</option>
+                        <option value="130">UNICHAIN</option>
+                        <option value="784">SUI</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="button">
+                    Request CallData 
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m0 0l3-3m-3 3l3-3m-2.288-7.212a1 1 0 011.414 0l2.828 2.828a1 1 0 01-1.414 1.414L12 10.586l-2.828 2.828a1 1 0 01-1.414-1.414l2.828-2.828a1 1 0 010-1.414z" />
+                    </svg>
+                </button>
+            </form>
+
+            <div class="button-container">
+                <button class="button" onclick="copyToInput()">
+                    Copy to Input 
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6a3.75 3.75 0 10-7.5 0v1.5m15 0V6a3.75 3.75 0 10-7.5 0v1.5m0 10.5A3.75 3.75 0 0012 19.5a3.75 3.75 0 003.75-3.75 V18m0 3.75h.008v.008H18v-.008h-.008v-.008zm0-10.5a3.75 3.75 0 00-3.75-3.75 3.75 3.75 0 00-3.75 3.75v1.5m0-1.5a3.75 3.75 0 013.75-3.75 3.75 3.75 0 013.75 3.75v1.5" />
+                    </svg>
+                </button>
+                <button class="button" onclick="copyToClipboard()">
+                    Copy JSON 
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6a3.75 3.75 0 117.5 0v1.5m-6 10.125A2.25 2.25 0 016.75 16.5v-1.5a4.5 4.5 0 019 0v1.5a2.25 2.25 0 01-2.25 2.25H8.25zM18 10.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                    </svg>
+                </button>
+            </div>
+
+            <pre id="callDataResult"></pre>
+        </div>
     </div>
-</div>
 
-<script>
-    document.getElementById('transactionForm').addEventListener('submit', async function (event) {
-        event.preventDefault();
+    <script>
+        // 保持原有JS逻辑不变
+        document.getElementById('transactionForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-        const chainId = document.getElementById('chainId').value;
-        const jsonInput = document.getElementById('jsonInput').value;
-        const transactionStatus = document.getElementById('transactionStatus');
-        transactionStatus.innerText = 'Sending transaction...';
-        transactionStatus.style.fontSize = '20px';
-        transactionStatus.style.padding = '20px';
-        transactionStatus.style.border = '2px solid #000';
-        transactionStatus.style.backgroundColor = '#f0f0f0';
+            const chainId = document.getElementById('chainId').value;
+            const jsonInput = document.getElementById('jsonInput').value;
+            const transactionStatus = document.getElementById('transactionStatus');
+            transactionStatus.innerText = 'Sending transaction...';
+            transactionStatus.style.fontSize = '20px';
+            transactionStatus.style.padding = '20px';
+            transactionStatus.style.border = '2px solid #000';
+            transactionStatus.style.backgroundColor = '#f0f0f0';
 
-        try {
-            const response = await fetch('http://localhost:3000/send-transaction', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ chainId, jsonInput })
-            });
-
-            console.log('Response received:', response);
-            let result;
             try {
-                result = await response.json(); // 尝试解析 JSON
-            } catch (jsonError) {
-                console.error('Failed to parse JSON:', jsonError);
-                transactionStatus.innerText = 'Failed to parse server response.';
-                return;
+                const response = await fetch('http://localhost:3000/send-transaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chainId, jsonInput })
+                });
+
+                console.log('Response received:', response);
+                let result;
+                try {
+                    result = await response.json(); // 尝试解析 JSON
+                } catch (jsonError) {
+                    console.error('Failed to parse JSON:', jsonError);
+                    transactionStatus.innerText = 'Failed to parse server response.';
+                    return;
+                }
+
+                console.log('Response status:', response.status);
+                console.log('Result:', result);
+
+                if (response.ok) {
+                    transactionStatus.innerText = 'Transaction sent successfully: ' + result.transactionHash;
+                    transactionStatus.className = 'status success';
+                } else {
+                    console.log('Error result:', result);
+                    const errorMessage = result.error?.message || JSON.stringify(result.error || result);
+                    transactionStatus.innerText = 'Error: ' + errorMessage;
+                    transactionStatus.className = 'status error';
+                }
+            } catch (error) {
+                const errorMessage = error.toString() + '\n' + (error.stack || '');
+                console.error('Error in client:', errorMessage);
+                transactionStatus.innerText = 'Failed to send transaction: ' + error.message;
+                transactionStatus.className = 'status error';
             }
-
-            console.log('Response status:', response.status);
-            console.log('Result:', result);
-
-            if (response.ok) {
-                transactionStatus.innerText = 'Transaction sent successfully: ' + result.transactionHash;
-            } else {
-                console.log('Error result:', result);
-                const errorMessage = result.error?.message || JSON.stringify(result.error || result);
-                transactionStatus.innerText = 'Error: ' + errorMessage;
-            }
-        } catch (error) {
-            const errorMessage = error.toString() + '\n' + (error.stack || '');
-            console.error('Error in client:', errorMessage);
-            transactionStatus.innerText = 'Failed to send transaction: ' + error.message;
-        }
-    });
-
-    document.getElementById('callDataForm').addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        const from = document.getElementById('from').value;
-        const to = document.getElementById('to').value;
-        const amount = document.getElementById('amount').value;
-        const callChainId = parseInt(document.getElementById('callChainId').value);
-
-        const callDataUrl = `https://beta.okex.org/api/v5/dex/aggregator/swap?chainId=${callChainId}&fromTokenAddress=${from}&amount=${amount}&toTokenAddress=${to}&slippage=0.03&userWalletAddress=0x6f9ffea7370310cd0f890dfde5e0e061059dcfd9&priceTolerance=0&callDataMemo=0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111&toTokenReferrerAddress=0x14f69e1733da14f595ecdb433fa5583ff7d6db16&feePercent=3`;
-
-        try {
-            const response = await fetch(`http://localhost:3001/proxy?url=${encodeURIComponent(callDataUrl)}`);
-            const result = await response.json();
-
-            if (response.ok) {
-                document.getElementById('callDataResult').innerText = JSON.stringify(result, null, 2);
-            } else {
-                document.getElementById('callDataResult').innerText = 'Error: ' + result;
-            }
-        } catch (error) {
-            document.getElementById('callDataResult').innerText = 'Error: ' + error.message;
-        }
-    });
-
-    function setAmount(value) {
-        document.getElementById('amount').value = value;
-    }
-
-    function copyToClipboard() {
-        const jsonText = document.getElementById('callDataResult').innerText;
-        navigator.clipboard.writeText(jsonText).then(() => {
-            alert('JSON copied to clipboard');
-        }).catch(err => {
-            alert('Failed to copy JSON: ' + err);
         });
-    }
 
-    function copyToInput() {
-        const jsonText = document.getElementById('callDataResult').innerText;
-        try {
-            const jsonObj = JSON.parse(jsonText);
-            const txJson = JSON.stringify(jsonObj.data[0].tx, null, 2);
-            console.log(txJson);
-            const jsonInput = document.getElementById('jsonInput');
-            jsonInput.value = txJson;
-            jsonInput.style.height = 'auto';
-            jsonInput.style.height = jsonInput.scrollHeight + 'px';
-        } catch (error) {
-            alert('Failed to parse JSON: ' + error);
+        document.getElementById('callDataForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            const amount = document.getElementById('amount').value;
+            const callChainId = parseInt(document.getElementById('callChainId').value);
+
+            const callDataUrl = `https://beta.okex.org/api/v5/dex/aggregator/swap?chainId=${callChainId}&fromTokenAddress=${from}&amount=${amount}&toTokenAddress=${to}&slippage=0.03&userWalletAddress=0x6f9ffea7370310cd0f890dfde5e0e061059dcfd9&priceTolerance=0&callDataMemo=0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111&toTokenReferrerAddress=0x14f69e1733da14f595ecdb433fa5583ff7d6db16&feePercent=3`;
+
+            try {
+                const response = await fetch(`http://localhost:3001/proxy?url=${encodeURIComponent(callDataUrl)}`);
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('callDataResult').innerText = JSON.stringify(result, null, 2);
+                } else {
+                    document.getElementById('callDataResult').innerText = 'Error: ' + result;
+                }
+            } catch (error) {
+                document.getElementById('callDataResult').innerText = 'Error: ' + error.message;
+            }
+        });
+
+        function setAmount(value) {
+            document.getElementById('amount').value = value;
         }
-    }
 
-    // Snow effect
-    // function createSnowflake() {
-    //     const snowflake = document.createElement('div');
-    //     snowflake.classList.add('snowflake');
-    //     snowflake.innerHTML = '❄️';
-    //     snowflake.style.left = Math.random() * window.innerWidth + 'px';
-    //     snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
-    //     snowflake.style.animationName = 'fall, sway';
-    //     snowflake.style.animationTimingFunction = 'linear, ease-in-out';
-    //     snowflake.style.animationIterationCount = 'infinite, infinite';
-    //     snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
-    //     document.body.appendChild(snowflake);
-    //
-    //     setTimeout(() => {
-    //         snowflake.remove();
-    //     }, 5000);
-    // }
-    //
-    // setInterval(createSnowflake, 100);
-</script>
+        function copyToClipboard() {
+            const jsonText = document.getElementById('callDataResult').innerText;
+            navigator.clipboard.writeText(jsonText).then(() => {
+                alert('JSON copied to clipboard');
+            }).catch(err => {
+                alert('Failed to copy JSON: ' + err);
+            });
+        }
+
+        function copyToInput() {
+            const jsonText = document.getElementById('callDataResult').innerText;
+            try {
+                const jsonObj = JSON.parse(jsonText);
+                const txJson = JSON.stringify(jsonObj.data[0].tx, null, 2);
+                console.log(txJson);
+                const jsonInput = document.getElementById('jsonInput');
+                jsonInput.value = txJson;
+                jsonInput.style.height = 'auto';
+                jsonInput.style.height = jsonInput.scrollHeight + 'px';
+            } catch (error) {
+                alert('Failed to parse JSON: ' + error);
+            }
+        }
+
+        // 雪花效果（保留原有逻辑，如需启用取消注释）
+        // function createSnowflake() {
+        //     const snowflake = document.createElement('div');
+        //     snowflake.classList.add('snowflake');
+        //     snowflake.innerHTML = '❄️';
+        //     snowflake.style.left = Math.random() * window.innerWidth + 'px';
+        //     snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+        //     snowflake.style.animationName = 'fall, sway';
+        //     snowflake.style.animationTimingFunction = 'linear, ease-in-out';
+        //     snowflake.style.animationIterationCount = 'infinite, infinite';
+        //     snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+        //     document.body.appendChild(snowflake);
+
+        //     setTimeout(() => {
+        //         snowflake.remove();
+        //     }, 5000);
+        // }
+
+        // setInterval(createSnowflake, 100);
+    </script>
 </body>
 </html>
