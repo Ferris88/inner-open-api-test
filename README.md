@@ -1,30 +1,19 @@
 # 项目使用方法
 
 ## 1. 安装依赖
-```shell
-1. ‌安装 Homebrew
 
-终端执行命令（若已安装可跳过）：
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+1. 安装 Homebrew（如已安装可跳过）  
+   `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
 
-2. 通过 Homebrew 安装 Node.js# 项目使用指南
+2. 通过 Homebrew 安装 Node.js  
+   `brew install node`
 
-## 1. 安装依赖
+3. 验证 Node.js 和 npm 是否安装成功  
+   `node -v`  
+   `npm -v`
 
-```shell
-# 1. 安装 Homebrew（如已安装可跳过）
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# 2. 通过 Homebrew 安装 Node.js
-brew install node
-
-# 验证 Node.js 和 npm 是否安装成功
-node -v
-npm -v
-
-# 3. 安装项目依赖（推荐使用 yarn）
-yarn install
-```
+4. 安装项目依赖（推荐使用 yarn）  
+   `yarn install`
 
 ## 2. 配置项说明
 
@@ -45,6 +34,5 @@ yarn install
 
 ---
 
----
 > 💡 **如有疑问，欢迎查阅文档或联系 Ferris 获取支持。**
---- 
+---
