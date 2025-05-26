@@ -21,11 +21,12 @@
 最新版本已全面支持 Solana 和 SUI Chain。请按以下步骤操作： 
 
 
->  1. 请务必正确配置各链的 `XXX_PRIVATE_KEY`。
-> 2. 在 `display-index` 的 `callDataUrl` 中配置请求地址：**`url`**
-> 3. 若需发送 Tron 交易，请配置 **`TRON_PRIVATE_KEY`** 及 **`trongrid ApiKey`**
-> 4. `url` 中的 `user` 参数请替换为您自己的钱包地址
-> 5. 若涉及 Solana 交易，请前往 [Helius Dashboard](https://dashboard.helius.dev/) 申请节点
+>  1. 运行 `send-tx-demo-v1.js` 
+>  2. 请务必正确配置各链的 `XXX_PRIVATE_KEY`。
+>  3. 在 `display-index` 的 `callDataUrl` 中配置请求地址：**`url`**
+> 4. 若需发送 Tron 交易，请配置 **`TRON_PRIVATE_KEY`** 及 **`trongrid ApiKey`**
+> 5. `url` 中的 `user` 参数请替换为您自己的钱包地址
+> 6. 若涉及 Solana 交易，请前往 [Helius Dashboard](https://dashboard.helius.dev/) 申请节点
 
 ## 3. 示例效果
 
