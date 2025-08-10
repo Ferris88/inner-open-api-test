@@ -57,6 +57,50 @@ app.post('/send-transaction', async (req, res) => {
     }
 });
 
+// 一键三笔交易API端点
+app.post('/triple-trade', async (req, res) => {
+    try {
+        const { chainId, fromToken, toToken, thirdToken, amount, enableFee, feePercent, feeAddress } = req.body;
+        console.log('Triple trade request:', req.body);
+        
+        // 验证是否为EVM链
+        const evmChains = [1, 56, 137, 43114, 42161, 8453, 196, 10, 146, 130];
+        const chainIdNum = parseInt(chainId);
+        if (!evmChains.includes(chainIdNum)) {
+            throw new Error('一键三笔交易仅支持EVM链');
+        }
+        
+        // 执行三笔交易
+        const transactions = await executeTripleTrade({
+            chainId: chainIdNum,
+            fromToken,
+            toToken,
+            thirdToken,
+            amount,
+            enableFee,
+            feePercent,
+            feeAddress
+        });
+        
+        res.set('Access-Control-Allow-Origin', '*');
+        res.send({ 
+            success: true, 
+            transactions: transactions,
+            message: '三笔交易执行成功'
+        });
+        
+    } catch (error) {
+        console.error('Error in /triple-trade:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Unknown error',
+            stack: error.stack || 'No stack trace available',
+            code: error.code || 'UNKNOWN_ERROR'
+        });
+    }
+});
+
+
 async function sendTransaction(web3, txObject, privateKey) {
     try {
         const signedTx = await web3.eth.accounts.signTransaction(txObject, privateKey);
@@ -254,4 +298,144 @@ async function tron_send_tx(from, to, data, value, abi) {
         console.log(err);
     }
 }
+
+// 三笔交易执行函数
+async function executeTripleTrade({ chainId, fromToken, toToken, thirdToken, amount, enableFee, feePercent, feeAddress }) {
+    console.log('开始执行三笔交易...');
+    
+    // 获取用户钱包地址（这里需要从私钥推导地址）
+    const web3 = new Web3(getRpcUrl(chainId));
+    const userWallet = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY).address;
+    
+    const transactions = [];
+    
+    try {
+        // 第一笔交易：From -> To
+        console.log('执行第一笔交易: From -> To');
+        const tx1CallData = await getSwapCallData({
+            chainId,
+            fromTokenAddress: fromToken,
+            toTokenAddress: toToken,
+            amount,
+            userWalletAddress: userWallet,
+            enableFee,
+            feePercent,
+            feeAddress
+        });
+        const tx1Hash = await executeSwapTransaction(chainId, tx1CallData, userWallet);
+        transactions.push(tx1Hash);
+        console.log('第一笔交易完成:', tx1Hash);
+        
+        // 等待一段时间确保交易确认
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // 第二笔交易：To -> From
+        console.log('执行第二笔交易: To -> From');
+        const tx2CallData = await getSwapCallData({
+            chainId,
+            fromTokenAddress: toToken,
+            toTokenAddress: fromToken,
+            amount: calculateSwapAmount(amount, 0.95), // 考虑滑点，使用95%的金额
+            userWalletAddress: userWallet,
+            enableFee: false, // 第二笔不分佣
+            feePercent: null,
+            feeAddress: null
+        });
+        const tx2Hash = await executeSwapTransaction(chainId, tx2CallData, userWallet);
+        transactions.push(tx2Hash);
+        console.log('第二笔交易完成:', tx2Hash);
+        
+        // 等待一段时间确保交易确认
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // 第三笔交易：Third -> To
+        console.log('执行第三笔交易: Third -> To');
+        const tx3CallData = await getSwapCallData({
+            chainId,
+            fromTokenAddress: thirdToken,
+            toTokenAddress: toToken,
+            amount,
+            userWalletAddress: userWallet,
+            enableFee: false, // 第三笔不分佣
+            feePercent: null,
+            feeAddress: null
+        });
+        const tx3Hash = await executeSwapTransaction(chainId, tx3CallData, userWallet);
+        transactions.push(tx3Hash);
+        console.log('第三笔交易完成:', tx3Hash);
+        
+        console.log('三笔交易全部完成!');
+        return transactions;
+        
+    } catch (error) {
+        console.error('三笔交易执行失败:', error);
+        if (transactions.length > 0) {
+            console.log('已执行的交易:', transactions);
+        }
+        throw new Error(`三笔交易执行失败: ${error.message}。已执行 ${transactions.length} 笔交易`);
+    }
+}
+
+// 获取交换callData
+async function getSwapCallData({ chainId, fromTokenAddress, toTokenAddress, amount, userWalletAddress, enableFee, feePercent, feeAddress }) {
+    let swapUrl = `https://beta.okex.org/api/v5/dex/aggregator/swap?chainId=${chainId}&fromTokenAddress=${fromTokenAddress}&amount=${amount}&toTokenAddress=${toTokenAddress}&slippage=0.03&userWalletAddress=${userWalletAddress}&priceTolerance=0&callDataMemo=0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111`;
+    
+    // 如果启用分佣，添加分佣参数
+    if (enableFee && feePercent && feeAddress) {
+        swapUrl += `&toTokenReferrerAddress=${feeAddress}&feePercent=${feePercent}`;
+    }
+    
+    console.log('请求swap API:', swapUrl);
+    
+    return new Promise((resolve, reject) => {
+        request({ url: swapUrl }, (error, response, body) => {
+            if (error) {
+                reject(error);
+            } else {
+                try {
+                    const result = JSON.parse(body);
+                    if (result.data && result.data[0] && result.data[0].tx) {
+                        resolve(result.data[0].tx);
+                    } else {
+                        reject(new Error('API响应格式错误: ' + body));
+                    }
+                } catch (parseError) {
+                    reject(new Error('解析API响应失败: ' + parseError.message));
+                }
+            }
+        });
+    });
+}
+
+// 执行交换交易
+async function executeSwapTransaction(chainId, txData, userWallet) {
+    const web3 = new Web3(getRpcUrl(chainId));
+    
+    const nonce = await web3.eth.getTransactionCount(userWallet, 'latest');
+    const gasPrice = await web3.eth.getGasPrice();
+    const gasLimit = await estimateGas(web3, {
+        from: userWallet,
+        to: txData.to,
+        data: txData.data,
+        value: parseInt(txData.value, 10)
+    });
+    
+    const txObject = {
+        nonce: nonce,
+        to: txData.to,
+        gasLimit: gasLimit * BigInt(2),
+        gasPrice: gasPrice * BigInt(3) / BigInt(2),
+        data: txData.data,
+        value: parseInt(txData.value, 10)
+    };
+    
+    return await sendTransaction(web3, txObject, PRIVATE_KEY);
+}
+
+// 计算交换金额（考虑滑点）
+function calculateSwapAmount(originalAmount, ratio = 1.0) {
+    return Math.floor(parseInt(originalAmount) * ratio).toString();
+}
+
+
 
