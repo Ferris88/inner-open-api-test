@@ -181,35 +181,144 @@
     
     <div class="tutorial card">
         <h2>使用教程</h2>
-        <ol style="padding-left: 25px; counter-reset: step">
-            <li style="position: relative; margin-bottom: 10px; list-style: none;">
-                <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
-                      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-                      font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
-                页面右边可以发起pre环境的/swap 接口
-            </li>
-            <li style="position: relative; margin-bottom: 10px; list-style: none;">
-                <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
-                      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-                      font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
-                点击[Copy to Input]可以将请求的/swap接口 tx信息自动填写到左边
-            </li>
-            <li style="position: relative; margin-bottom: 10px; list-style: none;">
-                <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
-                      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-                      font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
-                点击“Send Transaction”按钮发送交易。
-            </li>
-            <li style="position: relative; margin-bottom: 10px; list-style: none;">
-                <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
-                      border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-                      font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
-                查看交易状态。
-            </li>
-        </ol>
+        <div style="margin-bottom: 20px;">
+            <h3 style="color: #ff6b6b; margin-bottom: 10px;">🔥 一键三笔交易 (新功能!)</h3>
+            <ol style="padding-left: 25px; margin-bottom: 15px;">
+                <li>填写From、To、Third三个代币地址</li>
+                <li>设置交易金额</li>
+                <li>可选：启用From代币分佣</li>
+                <li>点击"执行一键三笔交易"开始交易</li>
+            </ol>
+        </div>
+        
+        <div>
+            <h3 style="color: #1a73e8; margin-bottom: 10px;">📝 单笔交易</h3>
+            <ol style="padding-left: 25px; counter-reset: step">
+                <li style="position: relative; margin-bottom: 10px; list-style: none;">
+                    <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
+                          border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                          font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
+                    页面右边可以发起pre环境的/swap 接口
+                </li>
+                <li style="position: relative; margin-bottom: 10px; list-style: none;">
+                    <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
+                          border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                          font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
+                    点击[Copy to Input]可以将请求的/swap接口 tx信息自动填写到左边
+                </li>
+                <li style="position: relative; margin-bottom: 10px; list-style: none;">
+                    <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
+                          border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                          font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
+                    点击"Send Transaction"按钮发送交易。
+                </li>
+                <li style="position: relative; margin-bottom: 10px; list-style: none;">
+                    <span style="position: absolute; left: -25px; width: 20px; height: 20px; background: #1a73e8; color: white; 
+                          border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                          font-size: 0.875rem; counter-increment: step; content: counter(step);"></span>
+                    查看交易状态。
+                </li>
+            </ol>
+        </div>
     </div>
 
     <div class="container">
+        <!-- 一键三笔交易功能 -->
+        <div class="form-container card">
+            <h2 style="color: #1a73e8; margin-bottom: 20px;">🔥 一键三笔交易</h2>
+            <div class="tutorial" style="background: #fff3cd; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+                <p><strong>交易流程：</strong></p>
+                <ol style="margin: 10px 0; padding-left: 20px;">
+                    <li>From → To (第一笔)</li>
+                    <li>To → From (第二笔)</li>
+                    <li>Third → To (第三笔)</li>
+                </ol>
+                <p style="color: #dc3545; font-weight: bold;">⚠️ 请确保提前approve所有代币！</p>
+                <p style="color: #28a745;">✅ 仅支持EVM链</p>
+            </div>
+            
+            <form id="tripleTradeForm">
+                <div class="form-group">
+                    <label for="tripleChainId">Chain ID (仅支持EVM):</label>
+                    <select id="tripleChainId" name="tripleChainId" class="large-input" required>
+                        <option value="1">ETH</option>
+                        <option value="56">BSC</option>
+                        <option value="137">POLYGON</option>
+                        <option value="43114">AVALANCHE</option>
+                        <option value="42161">ARBITRUM</option>
+                        <option value="8453">BASE</option>
+                        <option value="196">X_LAYER</option>
+                        <option value="10">OP</option>
+                        <option value="146">SONIC</option>
+                        <option value="130">UNICHAIN</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fromToken">From Token (起始代币地址):</label>
+                    <input type="text" id="fromToken" name="fromToken" class="large-input" required 
+                           placeholder="0x代币合约地址">
+                </div>
+
+                <div class="form-group">
+                    <label for="toToken">To Token (目标代币地址):</label>
+                    <input type="text" id="toToken" name="toToken" class="large-input" required 
+                           placeholder="0x代币合约地址">
+                </div>
+
+                <div class="form-group">
+                    <label for="thirdToken">Third Token (第三代币地址):</label>
+                    <input type="text" id="thirdToken" name="thirdToken" class="large-input" required 
+                           placeholder="0x代币合约地址">
+                </div>
+
+                <div class="form-group">
+                    <label for="tradeAmount">交易金额:</label>
+                    <input type="text" id="tradeAmount" name="tradeAmount" class="large-input" required 
+                           placeholder="例如: 1000000000000000000 (1 ETH)">
+                    <div class="button-container">
+                        <button type="button" class="button" onclick="setTripleAmount(1000000)">
+                            1,000,000 
+                        </button>
+                        <button type="button" class="button" onclick="setTripleAmount(1000000000000000)">
+                            0.001 ETH
+                        </button>
+                        <button type="button" class="button" onclick="setTripleAmount(1000000000000000000)">
+                            1 ETH
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 分佣设置 -->
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enableFee" onchange="toggleFeeSettings()"> 
+                        启用From代币分佣
+                    </label>
+                </div>
+
+                <div id="feeSettings" style="display: none;">
+                    <div class="form-group">
+                        <label for="feePercent">分佣比例 (%):</label>
+                        <input type="number" id="feePercent" name="feePercent" class="large-input" 
+                               placeholder="例如: 3 (表示3%)" min="0" max="100" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feeAddress">分佣地址:</label>
+                        <input type="text" id="feeAddress" name="feeAddress" class="large-input" 
+                               placeholder="0x分佣接收地址">
+                    </div>
+                </div>
+
+                <button type="submit" class="button" style="background: linear-gradient(45deg, #ff6b6b, #feca57); font-weight: bold;">
+                    🚀 执行一键三笔交易
+                </button>
+            </form>
+            
+            <div id="tripleTradeStatus" class="status"></div>
+        </div>
+
         <div class="form-container card">
             <form id="transactionForm">
                 <div class="form-group">
@@ -441,6 +550,122 @@
         // }
 
         // setInterval(createSnowflake, 100);
+
+        // 一键三笔交易相关功能
+        function setTripleAmount(value) {
+            document.getElementById('tradeAmount').value = value;
+        }
+
+        function toggleFeeSettings() {
+            const enableFee = document.getElementById('enableFee').checked;
+            const feeSettings = document.getElementById('feeSettings');
+            feeSettings.style.display = enableFee ? 'block' : 'none';
+        }
+
+        // 三笔交易表单提交处理
+        document.getElementById('tripleTradeForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            
+            const tripleChainId = document.getElementById('tripleChainId').value;
+            const fromToken = document.getElementById('fromToken').value;
+            const toToken = document.getElementById('toToken').value;
+            const thirdToken = document.getElementById('thirdToken').value;
+            const tradeAmount = document.getElementById('tradeAmount').value;
+            const enableFee = document.getElementById('enableFee').checked;
+            const feePercent = enableFee ? document.getElementById('feePercent').value : null;
+            const feeAddress = enableFee ? document.getElementById('feeAddress').value : null;
+            
+            const tripleTradeStatus = document.getElementById('tripleTradeStatus');
+            tripleTradeStatus.innerText = '准备执行三笔交易...';
+            tripleTradeStatus.style.fontSize = '16px';
+            tripleTradeStatus.style.padding = '15px';
+            tripleTradeStatus.style.border = '2px solid #1a73e8';
+            tripleTradeStatus.style.backgroundColor = '#e3f2fd';
+            tripleTradeStatus.className = 'status';
+            
+            // 验证输入
+            if (!fromToken || !toToken || !thirdToken || !tradeAmount) {
+                tripleTradeStatus.innerText = '错误：请填写所有必填字段';
+                tripleTradeStatus.className = 'status error';
+                return;
+            }
+            
+            if (enableFee && (!feePercent || !feeAddress)) {
+                tripleTradeStatus.innerText = '错误：启用分佣时必须填写分佣比例和地址';
+                tripleTradeStatus.className = 'status error';
+                return;
+            }
+            
+            // 检查是否为EVM链
+            const evmChains = ['1', '56', '137', '43114', '42161', '8453', '196', '10', '146', '130'];
+            if (!evmChains.includes(tripleChainId)) {
+                tripleTradeStatus.innerText = '错误：一键三笔交易仅支持EVM链';
+                tripleTradeStatus.className = 'status error';
+                return;
+            }
+            
+            try {
+                const requestData = {
+                    chainId: tripleChainId,
+                    fromToken,
+                    toToken,
+                    thirdToken,
+                    amount: tradeAmount,
+                    enableFee,
+                    feePercent: enableFee ? parseFloat(feePercent) : null,
+                    feeAddress: enableFee ? feeAddress : null
+                };
+                
+                const response = await fetch('http://localhost:3000/triple-trade', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    tripleTradeStatus.innerHTML = `
+                        <div style="color: #28a745;">✅ 三笔交易执行成功！</div>
+                        <div style="margin-top: 10px;">
+                            <strong>交易哈希：</strong><br>
+                            ${result.transactions.map((tx, index) => 
+                                `第${index + 1}笔: <a href="${getExplorerUrl(tripleChainId, tx)}" target="_blank" style="color: #1a73e8;">${tx}</a>`
+                            ).join('<br>')}
+                        </div>
+                    `;
+                    tripleTradeStatus.className = 'status success';
+                } else {
+                    tripleTradeStatus.innerText = '错误：' + (result.message || JSON.stringify(result));
+                    tripleTradeStatus.className = 'status error';
+                }
+            } catch (error) {
+                console.error('三笔交易执行失败:', error);
+                tripleTradeStatus.innerText = '网络错误：' + error.message;
+                tripleTradeStatus.className = 'status error';
+            }
+        });
+        
+        // 获取区块链浏览器URL
+        function getExplorerUrl(chainId, txHash) {
+            const explorers = {
+                '1': 'https://etherscan.io/tx/',
+                '56': 'https://bscscan.com/tx/',
+                '137': 'https://polygonscan.com/tx/',
+                '43114': 'https://snowtrace.io/tx/',
+                '42161': 'https://arbiscan.io/tx/',
+                '8453': 'https://basescan.org/tx/',
+                '196': 'https://www.oklink.com/xlayer/tx/',
+                '10': 'https://optimistic.etherscan.io/tx/',
+                '146': 'https://explorer.sonic.game/tx/',
+                '130': 'https://unichain-sepolia.blockscout.com/tx/'
+            };
+            return (explorers[chainId] || 'https://etherscan.io/tx/') + txHash;
+        }
+
+
     </script>
 </body>
 </html>
