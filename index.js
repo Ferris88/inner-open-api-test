@@ -132,7 +132,7 @@ async function main(transactionData) {
         const txObject = {
             nonce: nonce,
             to: to,
-            gasLimit: gasLimit * BigInt(2),
+            gasLimit: gasLimit * BigInt(3) / BigInt(2),
             gasPrice: gasPrice * BigInt(3) / BigInt(2),
             data: data,
             value: parseInt(value, 10)
@@ -225,7 +225,7 @@ function getRpcUrl(chainId) {
         case ChainId.BSC:
             return 'https://binance.llamarpc.com';
         case ChainId.POLYGON:
-            return 'https://polygon.llamarpc.com';
+            return 'https://polygon-pokt.nodies.app';
         case ChainId.AVALANCHE:
             return 'https://avalanche-c-chain-rpc.publicnode.com';
         case ChainId.ARBITRUM:
@@ -302,13 +302,11 @@ async function tron_send_tx(from, to, data, value, abi) {
 // 三笔交易执行函数
 async function executeTripleTrade({ chainId, fromToken, toToken, thirdToken, amount, enableFee, feePercent, feeAddress }) {
     console.log('开始执行三笔交易...');
-    
-    // 获取用户钱包地址（这里需要从私钥推导地址）
+
     const web3 = new Web3(getRpcUrl(chainId));
-    const userWallet = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY).address;
-    
+    const userWallet = '';
     const transactions = [];
-    
+
     try {
         // 第一笔交易：From -> To
         console.log('执行第一笔交易: From -> To');
@@ -316,7 +314,7 @@ async function executeTripleTrade({ chainId, fromToken, toToken, thirdToken, amo
             chainId,
             fromTokenAddress: fromToken,
             toTokenAddress: toToken,
-            amount,
+            amount: fromToken.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? amount : '1000000',
             userWalletAddress: userWallet,
             enableFee,
             feePercent,
@@ -325,48 +323,46 @@ async function executeTripleTrade({ chainId, fromToken, toToken, thirdToken, amo
         const tx1Hash = await executeSwapTransaction(chainId, tx1CallData, userWallet);
         transactions.push(tx1Hash);
         console.log('第一笔交易完成:', tx1Hash);
-        
-        // 等待一段时间确保交易确认
+
         await new Promise(resolve => setTimeout(resolve, 2000));
-        
+
         // 第二笔交易：To -> From
         console.log('执行第二笔交易: To -> From');
         const tx2CallData = await getSwapCallData({
             chainId,
             fromTokenAddress: toToken,
             toTokenAddress: fromToken,
-            amount: calculateSwapAmount(amount, 0.95), // 考虑滑点，使用95%的金额
+            amount: fromToken.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ?  '1000000' : amount,
             userWalletAddress: userWallet,
-            enableFee: false, // 第二笔不分佣
+            enableFee: false,
             feePercent: null,
             feeAddress: null
         });
         const tx2Hash = await executeSwapTransaction(chainId, tx2CallData, userWallet);
         transactions.push(tx2Hash);
         console.log('第二笔交易完成:', tx2Hash);
-        
-        // 等待一段时间确保交易确认
+
         await new Promise(resolve => setTimeout(resolve, 2000));
-        
+
         // 第三笔交易：Third -> To
         console.log('执行第三笔交易: Third -> To');
         const tx3CallData = await getSwapCallData({
             chainId,
             fromTokenAddress: thirdToken,
             toTokenAddress: toToken,
-            amount,
+            amount: thirdToken.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? amount : '1000000',
             userWalletAddress: userWallet,
-            enableFee: false, // 第三笔不分佣
+            enableFee: false,
             feePercent: null,
             feeAddress: null
         });
         const tx3Hash = await executeSwapTransaction(chainId, tx3CallData, userWallet);
         transactions.push(tx3Hash);
         console.log('第三笔交易完成:', tx3Hash);
-        
+
         console.log('三笔交易全部完成!');
         return transactions;
-        
+
     } catch (error) {
         console.error('三笔交易执行失败:', error);
         if (transactions.length > 0) {
@@ -436,6 +432,3 @@ async function executeSwapTransaction(chainId, txData, userWallet) {
 function calculateSwapAmount(originalAmount, ratio = 1.0) {
     return Math.floor(parseInt(originalAmount) * ratio).toString();
 }
-
-
-
