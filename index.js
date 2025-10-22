@@ -374,7 +374,7 @@ async function executeTripleTrade({ chainId, fromToken, toToken, thirdToken, amo
 
 // 获取交换callData
 async function getSwapCallData({ chainId, fromTokenAddress, toTokenAddress, amount, userWalletAddress, enableFee, feePercent, feeAddress }) {
-    let swapUrl = `https://beta.okex.org/api/v5/dex/aggregator/swap?chainId=${chainId}&fromTokenAddress=${fromTokenAddress}&amount=${amount}&toTokenAddress=${toTokenAddress}&slippage=0.03&userWalletAddress=${userWalletAddress}&priceTolerance=0&callDataMemo=0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111`;
+    let swapUrl = `https://beta.okex.org/api/v6/dex/aggregator/swap?chainId=${chainId}&fromTokenAddress=${fromTokenAddress}&amount=${amount}&toTokenAddress=${toTokenAddress}&slippage=0.03&userWalletAddress=${userWalletAddress}&priceTolerance=0&callDataMemo=0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111`;
     
     // 如果启用分佣，添加分佣参数
     if (enableFee && feePercent && feeAddress) {
