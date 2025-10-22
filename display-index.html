@@ -487,7 +487,7 @@
             const amount = document.getElementById('amount').value;
             const callChainId = parseInt(document.getElementById('callChainId').value);
 
-            const callDataUrl = `https://beta.okex.org/api/v5/dex/aggregator/swap?chainId=${callChainId}&fromTokenAddress=${from}&amount=${amount}&toTokenAddress=${to}&slippage=0.03&userWalletAddress=0x6f9ffea7370310cd0f890dfde5e0e061059dcfd9&priceTolerance=0&callDataMemo=0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111&toTokenReferrerAddress=0x14f69e1733da14f595ecdb433fa5583ff7d6db16&feePercent=3`;
+            const callDataUrl = `https://beta.okex.org/api/v6/dex/aggregator/swap?chainId=${callChainId}&fromTokenAddress=${from}&amount=${amount}&toTokenAddress=${to}&slippage=0.03&userWalletAddress=0x6f9ffea7370310cd0f890dfde5e0e061059dcfd9&priceTolerance=0&callDataMemo=0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111&toTokenReferrerAddress=0x14f69e1733da14f595ecdb433fa5583ff7d6db16&feePercent=3`;
 
             try {
                 const response = await fetch(`http://localhost:3001/proxy?url=${encodeURIComponent(callDataUrl)}`);
